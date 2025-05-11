@@ -1,5 +1,6 @@
-import { signalStore, withState } from '@ngrx/signals';
+import { signalStore, withComputed, withState } from '@ngrx/signals';
 import { Book } from './models/book.model';
+import { computed, InjectionToken } from '@angular/core';
 
 type BooksState = {
   books: Book[];
@@ -14,5 +15,25 @@ const initialState: BooksState = {
 };
 
 export const BooksStore = signalStore(
-  withState(initialState)
+     // 👇 Providing `BooksStore` at the root level.
+  { providedIn: 'root' },
+  withState(initialState),
+  // 👇 Accessing previously defined state signals and properties.
+  withComputed(({ books, filter }) => ({
+    booksCount: computed(() => books().length),
+    sortedBooks: computed(() => {
+      const direction = filter.order() === 'asc' ? 1 : -1;
+
+      return books().slice().sort((a, b) =>
+        direction * a.title.localeCompare(b.title)
+      );
+    }),
+  }))
 );
+
+// const BOOKS_STATE = new InjectionToken<BooksState>('BooksState', {
+//     factory: () => initialState,
+//   });
+//   const BooksStore = signalStore(
+//     withState(() => inject(BOOKS_STATE))
+//   );
