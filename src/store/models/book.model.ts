@@ -1,6 +1,7 @@
 export interface Book
 {
-    title: string;
-    author: string;
-    publishedYear: number;
+    title:string;
+    snippet:string;
+    wordcount:number;
+    pageid:number;
 }
